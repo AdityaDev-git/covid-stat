@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Async thunk for fetching COVID data
-export const fetchCovidDataWorld = createAsyncThunk("covid/fetchData", async () => {
+export const fetchDataWorld = createAsyncThunk("covid/fetchData", async () => {
   const response = await axios.get("https://covid-19.dataflowkit.com/v1/world");
   return response.data;
 });
 
-export const fetchCovidDataByCountry = createAsyncThunk(
+export const fetchDataCountry = createAsyncThunk(
   "covid/fetchByCountry",
   async (country, { rejectWithValue }) => {
     try {
@@ -26,37 +25,35 @@ const covidSlice = createSlice({
   initialState: {
     worldData: {},
     countryData: {},
-    statusWorld: 'idle',
-    statusCountry: 'idle',
-    errorWorld: null,
-    errorCountry: null,
+    worldState: 'idle',
+    countryState: 'idle',
+    worldDataError: null,
+    countryDataError: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      //world
-      .addCase(fetchCovidDataWorld.pending, (state) => {
-        state.statusWorld = 'loading';
+      .addCase(fetchDataWorld.pending, (state) => {
+        state.worldState = 'loading';
       })
-      .addCase(fetchCovidDataWorld.fulfilled, (state, action) => {
-        state.statusWorld = 'succeeded';
+      .addCase(fetchDataWorld.fulfilled, (state, action) => {
+        state.worldState = 'succeeded';
         state.worldData = action.payload;
       })
-      .addCase(fetchCovidDataWorld.rejected, (state, action) => {
-        state.statusWorld = 'failed';
-        state.errorWorld = action.payload || 'Failed to fetch world data';
+      .addCase(fetchDataWorld.rejected, (state, action) => {
+        state.worldState = 'failed';
+        state.worldDataError = action.payload;
       })
-      //country
-      .addCase(fetchCovidDataByCountry.pending, (state) => {
-        state.statusCountry = 'loading';
+      .addCase(fetchDataCountry.pending, (state) => {
+        state.countryState = 'loading';
       })
-      .addCase(fetchCovidDataByCountry.fulfilled, (state, action) => {
-        state.statusCountry = 'succeeded';
+      .addCase(fetchDataCountry.fulfilled, (state, action) => {
+        state.countryState = 'succeeded';
         state.countryData = action.payload;
       })
-      .addCase(fetchCovidDataByCountry.rejected, (state, action) => {
-        state.statusCountry = 'failed';
-        state.errorCountry = action.payload || 'Failed to fetch country data';
+      .addCase(fetchDataCountry.rejected, (state, action) => {
+        state.countryState = 'failed';
+        state.countryDataError = action.payload;
       });
   },
 });

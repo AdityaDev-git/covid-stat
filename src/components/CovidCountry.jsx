@@ -1,70 +1,53 @@
 import { useState } from "react";
-import { fetchCovidDataByCountry } from "../features/covidSlice";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Loading from "./Spinner";
+import Card from "react-bootstrap/Card";
+import { fetchDataCountry } from "../features/covidSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-
 const CovidCountry = () => {
-
-    const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("");
   const dispatch = useDispatch();
-  const { countryData, statusCountry, errorCountry } = useSelector((state) => state.covid);
+  const { countryData, countryState, countryDataError } = useSelector((state) => state.covid);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(fetchCovidDataByCountry(country));
+    dispatch(fetchDataCountry(country));
   };
 
-  if (statusCountry === 'loading') return <p>Loading country data...</p>;
-  if (errorCountry) return <p>Error fetching country data: {errorCountry}</p>;
-
+  if (countryState === "loading") return <Loading />;
+  if (countryDataError) return <p>Error fetching data: {countryDataError}</p>;
 
   return (
-    <div>
-        <form onSubmit={handleSubmit} >
-        <input
-          type="text"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          placeholder="Enter country name"
-        />
-        <button className="submit-btn" type="submit">Fetch Data</button>
-      </form>
-    
-      {countryData && Object.keys(countryData).length>0 && (
-        <div >
-          <p >Country: {countryData.Country_text}</p>
-          <p >
-            Active Cases:{" "}
-            <span>{countryData["Active Cases_text"]}</span>
-          </p>
-          <p>
-            Last Update: {countryData["Last Update"]}
-          </p>
-          <p>
-            New Cases:{" "}
-            <span>{countryData["New Cases_text"]}</span>
-          </p>
-          <p>
-            New Deaths: {countryData["New Deaths_text"]}
-          </p>
-          <p >
-            Total Cases: {countryData["Total Cases_text"]}
-          </p>
-          <p >
-            Total Deaths:{" "}
-            <span > {countryData["Total Deaths_text"]}</span>
-          </p>
-          <p >
-            Total Recovered:{" "}
-            <span>
-              {" "}
-              {countryData["Total Recovered_text"]}
-            </span>
-          </p>
+    <div className="p-4">
+      <Form className="d-flex flex-row gap-3 mb-3" onSubmit={handleSubmit}>
+        <Form.Group className=" col-6" controlId="formBasicEmail">
+          <Form.Control type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Enter your country name" />
+        </Form.Group>
+        <Button variant="primary" type="submit" className="px-3">
+          Get Data
+        </Button>
+      </Form>
+
+      {Object.keys(countryData).length > 0 && (
+        <div className="col-10">
+          <Card>
+            <Card.Header as="h5">Country: {countryData.Country_text}</Card.Header>
+            <Card.Body>
+              <Card.Text>Active Cases: {countryData["Active Cases_text"]}</Card.Text>
+              <Card.Text>Last Update: {countryData["Last Update"]}</Card.Text>
+              <Card.Text>New Cases: {countryData["New Cases_text"]}</Card.Text>
+              <Card.Text>New Deaths: {countryData["New Deaths_text"]}</Card.Text>
+              <Card.Text>Total Cases: {countryData["Total Cases_text"]}</Card.Text>
+              <Card.Text>Total Deaths: {countryData["Total Deaths_text"]}</Card.Text>
+              <Card.Text>Total Recovered: {countryData["Total Recovered_text"]}</Card.Text>
+            </Card.Body>
+          </Card>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CovidCountry
+export default CovidCountry;
